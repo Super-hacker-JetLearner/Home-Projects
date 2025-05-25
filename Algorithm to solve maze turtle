@@ -1,0 +1,165 @@
+import turtle
+import time
+
+maze = [
+"xxxxxxxxxxxxxxxx",
+"x xx     xxxxxxx",
+"x    xxx xxxxxxx",
+"xx xxxxx   xxxxx",
+"xx  xxxxxx  xxxx",
+"xxx xxxx xx    x",
+"xxx      xxxxxFx",
+"xxxxxxxxxxxxxxxx"]
+
+screen = turtle.Screen()
+
+
+def touch_wall(x,y):
+  global turtles
+  for i in turtles:
+    if round(i.xcor()) == round(x) and round(i.ycor()) == round(y):
+      return True
+  return False
+
+def touch_marked(x,y,marked):
+  for i in range(len(marked)):
+    if round(marked[i][0]) == round(x) and round(marked[i][1]) == round(y):
+      return True
+  return False
+
+
+def go(turtle,x,y):
+  turtle.penup()
+  turtle.goto(x,y)
+  turtle.pendown()
+
+
+turtles = []
+
+spacing = 22
+x_change = 150
+y_change = 50
+
+for i in range(len(maze)):
+  for j in range(len(maze[i])):
+    if maze[i][j] == "x":
+      new_turtle = turtle.Turtle()
+      new_turtle.speed(0)
+      new_turtle.shape("square")
+      go(new_turtle, j*spacing-x_change, i*-spacing+y_change)
+      turtles.append(new_turtle)
+    elif maze[i][j] == "F":
+      finish = turtle.Turtle()
+      finish.speed(0)
+      finish.shape("circle")
+      finish.color("green")
+      go(finish, j*spacing-x_change, i*-spacing+y_change)
+      
+start_x = spacing-x_change
+start_y = -spacing+y_change
+
+# for i in turtles:
+#   print(i.xcor(), i.ycor())
+
+
+
+def make_possibilities(x,y,marked):
+  possibilities = []
+
+  if not touch_wall(x, y+spacing) and not touch_marked(x,y+spacing,marked):
+    possibilities.append([x,y+spacing])
+    
+
+
+  if not touch_wall(x, y-spacing) and not touch_marked(x,y-spacing,marked):
+    possibilities.append([x,y-spacing])
+
+
+  if not touch_wall(x+spacing, y) and not touch_marked(x+spacing,y,marked):
+    possibilities.append([x+spacing,y])
+
+  if not touch_wall(x-spacing, y) and not touch_marked(x-spacing,y,marked):
+    possibilities.append([x-spacing,y])
+
+  return possibilities, marked
+
+solver = turtle.Turtle()
+solver.color("blue")
+solver.speed(0)
+solver.hideturtle()
+go(solver,start_x,start_y)
+solver.showturtle()
+solver.speed(1.5)
+
+found = False
+
+def solve(x,y,marked,moves):
+  global found
+  marked.append([x,y])
+  possibilities,new_marked = make_possibilities(x,y,marked)
+  for i in possibilities:
+    moves.append([x,y])
+    go(solver,i[0], i[1])
+    # print(i[0],i[1])
+    # print(marked)
+    if round(i[0]) == round(finish.xcor()) and round(i[1]) == round(finish.ycor()):
+      moves.append(i)
+      print("finish is here at {} {}".format(i[0], i[1]))
+      print(moves)
+      found = True
+      # print(marked)
+    solve(i[0],i[1],new_marked,moves)
+    if not found:
+      go(solver,x,y)
+      del moves[-1]
+
+
+marked = []
+moves = []
+solve(start_x, start_y, marked,moves)
+# print(spacing-x_change, -spacing+y_change)
+# print(make_possibilities(spacing-x_change, -spacing+y_change, marked))
+
+
+
+
+# player = turtle.Turtle()
+# player.shape("turtle")
+# player.color("blue")
+# go(player, start_x, start_y)
+
+# player.penup()
+
+# def up():
+#   player.setheading(90)
+#   if not touch_wall(player.xcor(), player.ycor()+spacing):
+#     player.forward(spacing)
+
+# def left():
+#   player.setheading(180)
+#   if not touch_wall(player.xcor()-spacing, player.ycor()):
+#     player.forward(spacing)
+
+# def right():
+#   player.setheading(0)
+#   if not touch_wall(player.xcor()+spacing, player.ycor()):
+#     player.forward(spacing)
+
+# def down():
+#   player.setheading(270)
+#   if not touch_wall(player.xcor(), player.ycor()-spacing):
+#     player.forward(spacing)
+
+
+# screen.listen()
+
+# screen.onkey(up,"Up")
+# screen.onkey(down,"Down")
+# screen.onkey(left,"Left")
+# screen.onkey(right,"Right")
+
+# while True:
+#   if round(player.xcor()) == round(finish.xcor()) and round(player.ycor()) == round(finish.ycor()):
+#     print("you have won!")
+#     break
+
