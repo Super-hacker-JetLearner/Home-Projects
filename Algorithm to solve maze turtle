@@ -16,8 +16,8 @@ screen = turtle.Screen()
 
 def touch_wall(x,y):
   global turtles
-  for i in turtles:
-    if round(i.xcor()) == round(x) and round(i.ycor()) == round(y):
+  for i in positions:
+    if round(i[0]) == round(x) and round(i[1]) == round(y):
       return True
   return False
 
@@ -35,6 +35,7 @@ def go(turtle,x,y):
 
 
 turtles = []
+positions = []
 
 spacing = 22
 x_change = 150
@@ -43,17 +44,21 @@ y_change = 50
 for i in range(len(maze)):
   for j in range(len(maze[i])):
     if maze[i][j] == "x":
+      # display the maze
       new_turtle = turtle.Turtle()
       new_turtle.speed(0)
       new_turtle.shape("square")
       go(new_turtle, j*spacing-x_change, i*-spacing+y_change)
       turtles.append(new_turtle)
+      positions.append([j*spacing-x_change, i*-spacing+y_change])
     elif maze[i][j] == "F":
+      # display the finish
       finish = turtle.Turtle()
       finish.speed(0)
       finish.shape("circle")
       finish.color("green")
       go(finish, j*spacing-x_change, i*-spacing+y_change)
+      f_pos = [j*spacing-x_change, i*-spacing+y_change]
       
 start_x = spacing-x_change
 start_y = -spacing+y_change
@@ -83,6 +88,7 @@ def make_possibilities(x,y,marked):
 
   return possibilities, marked
 
+# show solver
 solver = turtle.Turtle()
 solver.color("blue")
 solver.speed(0)
@@ -102,7 +108,7 @@ def solve(x,y,marked,moves):
     go(solver,i[0], i[1])
     # print(i[0],i[1])
     # print(marked)
-    if round(i[0]) == round(finish.xcor()) and round(i[1]) == round(finish.ycor()):
+    if round(i[0]) == round(f_pos[0]) and round(i[1]) == round(f_pos[1]):
       moves.append(i)
       print("finish is here at {} {}".format(i[0], i[1]))
       print(moves)
@@ -110,7 +116,9 @@ def solve(x,y,marked,moves):
       # print(marked)
     solve(i[0],i[1],new_marked,moves)
     if not found:
+      # show solver
       go(solver,x,y)
+      
       del moves[-1]
 
 
